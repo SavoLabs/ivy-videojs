@@ -11,13 +11,23 @@ module.exports = {
   },
 
   included: function(app) {
+
+    this._super.included.call(this, app)
+
     if (!process.env.EMBER_CLI_FASTBOOT) {
       var options = app.options.videojs || {};
+      var env = app.env;
 
-      app.import({
-        development: path.join(app.bowerDirectory, 'video.js/dist/video-js.css'),
-        production:  path.join(app.bowerDirectory, 'video.js/dist/video-js.min.css')
-      });
+      console.log('running savo version of ivy-videojs');
+      console.log('bowerDirectory: ', app.bowerDirectory);
+
+      app.bowerDirectory = app.bowerDirectory || 'bower_components';
+
+      if(app.env === 'production') {
+        app.import(path.join(app.bowerDirectory, 'video.js/dist/video-js.min.css'));
+      } else {
+        app.import(path.join(app.bowerDirectory, 'video.js/dist/video-js.css'));
+      }
 
       app.import(path.join(app.bowerDirectory, 'video.js/dist/font/VideoJS.eot'), { destDir: 'assets/font' });
       app.import(path.join(app.bowerDirectory, 'video.js/dist/font/VideoJS.svg'), { destDir: 'assets/font' });
@@ -30,10 +40,13 @@ module.exports = {
         }
       });
 
-      app.import({
-        development: path.join(app.bowerDirectory, 'video.js/dist/video.js'),
-        production:  path.join(app.bowerDirectory, 'video.js/dist/video.min.js')
-      });
+      if(app.env === 'production') {
+        app.import(path.join(app.bowerDirectory, 'video.js/dist/video.min.js'));
+      } else {
+
+        app.import(path.join(app.bowerDirectory, 'video.js/dist/video.js'));
+      }
+
 
       (options.languages || []).forEach(function(language) {
         app.import(path.join(app.bowerDirectory, 'video.js/dist/lang/' + language + '.js'));
